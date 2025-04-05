@@ -1,8 +1,8 @@
 import express from "express"
 
 
-import { AuthRepository1 } from "../../infrastructure/AuthRepository1"
-import { AuthRepository2 } from "../../infrastructure/AuthRepository2"
+import { AuthRepository1 } from "../../infrastructure/repository/AuthRepository1"
+import { AuthRepository2 } from "../../infrastructure/repository/AuthRepository2"
 
 
 

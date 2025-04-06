@@ -2,37 +2,37 @@
 
 import { IAuthRepository } from "../../domain/interfaces/IAuthRepository"
 
-export class AuthRepository1 implements IAuthRepository {
+export class SqliteAuthRepository implements IAuthRepository {
 
     async checkAuth(): Promise<string> {
-        return "checkAuth"
+        return "From Sqlite - checkAuth"
     }
 
     async register(): Promise<string> {
-        return "register"
+        return "From Sqlite - register"
     }
 
     async login(): Promise<string> {
-        return "login"
+        return "From Sqlite - login"
     }
 
     async logout(): Promise<string> {
-        return "logout"
+        return "From Sqlite - logout"
     }
 
     async verifyEmail(): Promise<string> {
-        return "verifyEmail"
+        return "From Sqlite - verifyEmail"
     }
 
     async resendVerificationCode(): Promise<string> {
-        return "resendVerificationCode"
+        return "From Sqlite - resendVerificationCode"
     }
 
     async forgotPassword(): Promise<string> {
-        return "forgotPassword"
+        return "From Sqlite - forgotPassword"
     }
 
     async resetPassword(): Promise<string> {
-        return "resetPassword"
+        return "From Sqlite - resetPassword"
     }
 }

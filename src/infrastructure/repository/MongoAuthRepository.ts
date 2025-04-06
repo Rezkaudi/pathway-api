@@ -2,37 +2,37 @@
 
 import { IAuthRepository } from "../../domain/interfaces/IAuthRepository"
 
-export class AuthRepository2 implements IAuthRepository {
+export class MongoAuthRepository implements IAuthRepository {
 
     async checkAuth(): Promise<string> {
-        return "2 checkAuth"
+        return "From MongoDB - checkAuth"
     }
 
     async register(): Promise<string> {
-        return "2 register"
+        return "From MongoDB - register"
     }
 
     async login(): Promise<string> {
-        return "2 login"
+        return "From MongoDB - login"
     }
 
     async logout(): Promise<string> {
-        return "2 logout"
+        return "From MongoDB - logout"
     }
 
     async verifyEmail(): Promise<string> {
-        return "2 verifyEmail"
+        return "From MongoDB - verifyEmail"
     }
 
     async resendVerificationCode(): Promise<string> {
-        return "2 resendVerificationCode"
+        return "From MongoDB - resendVerificationCode"
     }
 
     async forgotPassword(): Promise<string> {
-        return "2 forgotPassword"
+        return "From MongoDB - forgotPassword"
     }
 
     async resetPassword(): Promise<string> {
-        return "2 resetPassword"
+        return "From MongoDB - resetPassword"
     }
 }

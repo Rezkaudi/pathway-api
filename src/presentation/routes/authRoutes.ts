@@ -1,8 +1,8 @@
 import express from "express"
 
 
-import { AuthRepository1 } from "../../infrastructure/repository/AuthRepository1"
-import { AuthRepository2 } from "../../infrastructure/repository/AuthRepository2"
+import { MongoAuthRepository } from "../../infrastructure/repository/MongoAuthRepository"
+import { SqliteAuthRepository } from "../../infrastructure/repository/SqliteAuthRepository"
 
 
 
@@ -13,10 +13,10 @@ import { AuthController } from "../controllers/AuthControllers"
 const authRoutes = express.Router()
 
 // dynamic transaction from outside
-const authRepository1 = new AuthRepository1()
-const authRepository2 = new AuthRepository2()
+const mongoAuthRepository = new MongoAuthRepository()
+const sqliteAuthRepository = new SqliteAuthRepository()
 
-const authUseCase = new AuthUseCase(authRepository2)
+const authUseCase = new AuthUseCase(sqliteAuthRepository)
 const authController = new AuthController(authUseCase)
 
 

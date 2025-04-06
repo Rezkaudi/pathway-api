@@ -1,12 +1,12 @@
-import path from "path";
 import cors from 'cors';
-import express, { Express } from "express";
 
 import { CONFIG } from "./config/env";
+import express, { Express } from "express";
 
 import { logger } from './middleware/loggerMiddleware';
 import { errorHandler } from './middleware/errorHandler';
 import { notFoundHandler } from './middleware/notFoundHandler';
+
 
 export default class Server {
     private app: Express;
@@ -27,10 +27,7 @@ export default class Server {
     }
 
     private setupRoutes() {
-        this.app.get("/", (_, res) => {
-            res.sendFile(path.join(__dirname, "..", "..", "public", "index.html"));
-        });
-
+        this.app.get("/", require('./routes/rootRoute'));
         this.app.use('/api/auth', require('./routes/authRoutes'));
     }
 

@@ -2,10 +2,14 @@ import cors from 'cors';
 
 import { CONFIG } from "./config/env";
 import express, { Express } from "express";
+import cookieParser from 'cookie-parser';
 
-import { logger } from './middleware/loggerMiddleware';
-import { errorHandler } from './middleware/errorHandler';
-import { notFoundHandler } from './middleware/notFoundHandler';
+import { logger } from './middleware/logger.middleware';
+import { errorHandler, notFoundHandler } from './middleware/error.middleware';
+
+// routes
+import authRoutes from './routes/auth.routes';
+import rootRoute from './routes/root.routs';
 
 
 export default class Server {
@@ -22,13 +26,15 @@ export default class Server {
         this.app.use(cors());
         this.app.use(logger);
         this.app.use(express.json());
+        this.app.use(cookieParser());
         this.app.use(express.static("public"));
         this.app.use(express.urlencoded({ extended: false }));
+
     }
 
     private setupRoutes() {
-        this.app.get("/", require('./routes/rootRoute'));
-        this.app.use('/api/auth', require('./routes/authRoutes'));
+        this.app.use("/", rootRoute);
+        this.app.use('/api/auth', authRoutes);
     }
 
     private setupErrorHandlers() {

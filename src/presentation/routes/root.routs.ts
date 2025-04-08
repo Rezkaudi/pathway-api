@@ -8,4 +8,4 @@ rootRoute.get("/", (_, res) => {
 })
 
 
-module.exports = rootRoute
+export default rootRoute;

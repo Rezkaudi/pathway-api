@@ -12,3 +12,10 @@ export const errorHandler = (err: any, req: Request, res: Response, next: NextFu
     });
 
 };
+
+export const notFoundHandler = (req: Request, res: Response, next: NextFunction) => {
+    res.status(404).json({
+        statusCode: 404,
+        message: `Not Found - ${req.originalUrl}`,
+    });
+};

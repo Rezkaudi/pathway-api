@@ -1,6 +1,6 @@
 // use repository as type from outer layer
 
-import { IAuthRepository } from "../../domain/interfaces/IAuthRepository"
+import { IAuthRepository } from "../../domain/repository/user.repository"
 
 export class SqliteAuthRepository implements IAuthRepository {
 

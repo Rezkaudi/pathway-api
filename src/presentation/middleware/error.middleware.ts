@@ -1,19 +1,26 @@
 import { Request, Response, NextFunction } from 'express';
 
-export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
-    const statusCode = err.status || 500;
+import { ApplicationError } from '../../application/errors/application-error';
 
-    console.error(`Error: ${err.message || 'Internal Server Error'}`);
 
-    res.status(statusCode).json({
-        statusCode,
-        message: err.message || 'Internal Server Error',
-        ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
+
+    if (err instanceof ApplicationError) {
+        res.status(err.statusCode).json({
+            statusCode: err.statusCode,
+            message: err.message,
+            ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+        });
+    }
+
+    res.status(500).json({
+        statusCode: 500,
+        message: 'Internal Server Error'
     });
 
 };
 
-export const notFoundHandler = (req: Request, res: Response, next: NextFunction) => {
+export const notFoundHandler = (req: Request, res: Response) => {
     res.status(404).json({
         statusCode: 404,
         message: `Not Found - ${req.originalUrl}`,

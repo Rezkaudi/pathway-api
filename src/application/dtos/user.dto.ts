@@ -15,6 +15,16 @@ export interface TokenDTO {
     age: number,
 }
 
+export interface SecretTokenDTO {
+    token: string,
+    age: string,
+}
+
+export interface ResetPasswordDTO {
+    verificationToken: string,
+    newPassword: string,
+}
+
 export interface AuthResposnseDTO {
     accessToken: string,
     refreshToken: string

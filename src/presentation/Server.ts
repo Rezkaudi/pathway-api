@@ -1,19 +1,26 @@
+
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import express, { Express } from "express";
 
 import { CONFIG } from "./config/env";
-import express, { Express } from "express";
-import cookieParser from 'cookie-parser';
 
 import { logger } from './middleware/logger.middleware';
 import { errorHandler, notFoundHandler } from './middleware/error.middleware';
+import { authMiddleware } from './middleware/auth.middleware';
+
 
 // routes
+import rootRoute from './routes/root.routes';
 import authRoutes from './routes/auth.routes';
-import rootRoute from './routes/root.routs';
+
+import { setupDependencies } from './dependencies';
 
 
 export default class Server {
     private app: Express;
+    private container = setupDependencies();
+
 
     constructor() {
         this.app = express();
@@ -29,12 +36,12 @@ export default class Server {
         this.app.use(cookieParser());
         this.app.use(express.static("public"));
         this.app.use(express.urlencoded({ extended: false }));
-
+        this.app.use(authMiddleware(this.container.tokenService, this.container.userRepository))
     }
 
     private setupRoutes() {
-        this.app.use("/", rootRoute);
-        this.app.use('/api/auth', authRoutes);
+        this.app.use("/", rootRoute(this.container.rootController));
+        this.app.use('/api/auth', authRoutes(this.container.authController));
     }
 
     private setupErrorHandlers() {

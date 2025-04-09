@@ -5,7 +5,7 @@ dotenv.config();
 export const CONFIG = {
     NODE_ENV: process.env.NODE_ENV || "development",
     FRONT_URL: process.env.FRONT_URL || "http://localhost:3000",
-    SERVER_URL: process.env.SERVER_URL || "http://localhost:8080/",
+    SERVER_URL: process.env.SERVER_URL || "http://localhost:8080",
     PORT: process.env.PORT || 8080,
 
     GMAIL_USER: process.env.GMAIL_USER,
@@ -18,6 +18,17 @@ export const CONFIG = {
 
     JWT_EXPIRATION: "24h",
     REFRESH_TOKEN_EXPIRATION: "7d",
+
+
+    JWT_SECRET_ACCESS_TOKEN: {
+        token: process.env.JWT_SECRET || "",
+        age: "1d"
+    },
+
+    JWT_SECRET_REFRESH_TOKEN: {
+        token: process.env.REFRESH_TOKEN_SECRET || "",
+        age: "7d"
+    },
 
     ACCESS_TOKEN_COOKIE: {
         name: "accessToken",

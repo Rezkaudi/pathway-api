@@ -12,9 +12,26 @@ declare global {
     }
 }
 
+// Define a regex pattern for paths that should be excluded
+const excludedPaths = [
+    "/api/auth/refresh",
+    "/api/auth/register",
+    "/api/auth/login",
+    "/api/auth/verify-email",
+    "/api/auth/forgot-password",
+    "/api/auth/reset-password",
+];
+
 export const authMiddleware = (tokenService: TokenService, userRepository: UserRepository) => {
 
     return async (req: Request, res: Response, next: NextFunction) => {
+
+        // Check if the current path matches any excluded path
+        const isExcluded = excludedPaths.some(path => req.path === path);
+
+        if (isExcluded) {
+            return next();
+        }
 
         const accessToken = req.cookies[CONFIG.ACCESS_TOKEN_COOKIE.name];
         const refreshToken = req.cookies[CONFIG.REFRESH_TOKEN_COOKIE.name];

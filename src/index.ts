@@ -1,6 +1,6 @@
 
 import Server from "./presentation/Server";
-import Database from "./infrastructure/database/mongodb";
+import Database from "./infrastructure/database/mongoDB";
 
 async function main() {
     try {

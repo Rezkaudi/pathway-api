@@ -1,16 +1,25 @@
-// use use-case as type from application layer
-
 
 import { Request, Response } from "express"
-import { AuthUseCase } from "../../application/use-cases/auth.usecase"
 import { LoginDTO, RegisterDTO, TokenDTO } from "../../application/dtos/user.dto";
 import { CONFIG } from "../config/env";
+import {
+    LoginUseCase,
+    RegisterUseCase,
+    VerifyEmailUseCase,
+    ResetPasswordUseCase,
+    ForgotPasswordUseCase,
+    RefreshAccessTokenUseCase
+} from "../../application/use-cases/auth";
 
 
 export class AuthController {
     constructor(
-        private readonly authUseCase: AuthUseCase
-
+        private readonly loginUseCase: LoginUseCase,
+        private readonly registerUseCase: RegisterUseCase,
+        private readonly verifyEmailUseCase: VerifyEmailUseCase,
+        private readonly resetPasswordUseCase: ResetPasswordUseCase,
+        private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
+        private readonly refreshAccessTokenUseCase: RefreshAccessTokenUseCase,
     ) { }
 
     private setTokenCookie(res: Response, token: TokenDTO, tokenValue: string): void {
@@ -34,9 +43,7 @@ export class AuthController {
                 password
             }
 
-            console.log(registerData)
-
-            await this.authUseCase.register(registerData);
+            await this.registerUseCase.execute(registerData);
             res.status(201).json({ message: "User registered successfully. Please check your email for verification." });
 
         } catch (error) {
@@ -60,7 +67,7 @@ export class AuthController {
                 password
             }
 
-            const { accessToken, refreshToken } = await this.authUseCase.login(loginData);
+            const { accessToken, refreshToken } = await this.loginUseCase.execute(loginData);
 
             this.setTokenCookie(res, CONFIG.ACCESS_TOKEN_COOKIE, accessToken);
             this.setTokenCookie(res, CONFIG.REFRESH_TOKEN_COOKIE, refreshToken);
@@ -101,7 +108,7 @@ export class AuthController {
     verifyEmail = async (req: Request, res: Response): Promise<void> => {
         try {
             const { verificationToken } = req.body;
-            const { accessToken, refreshToken } = await this.authUseCase.verifyEmail(verificationToken);
+            const { accessToken, refreshToken } = await this.verifyEmailUseCase.execute(verificationToken);
 
             this.setTokenCookie(res, CONFIG.ACCESS_TOKEN_COOKIE, accessToken);
             this.setTokenCookie(res, CONFIG.REFRESH_TOKEN_COOKIE, refreshToken);
@@ -123,7 +130,7 @@ export class AuthController {
     resetPassword = async (req: Request, res: Response): Promise<void> => {
         try {
             const { newPassword, verificationToken } = req.body;
-            await this.authUseCase.resetPassword(verificationToken, newPassword);
+            await this.resetPasswordUseCase.execute({ verificationToken, newPassword });
 
             res.status(200).json({ message: "Password reset successfully. You can now log in with your new password." });
         } catch (error) {
@@ -138,7 +145,7 @@ export class AuthController {
     forgotPassword = async (req: Request, res: Response): Promise<void> => {
         try {
             const { email } = req.body;
-            await this.authUseCase.forgotPassword(email);
+            await this.forgotPasswordUseCase.execute(email);
             res.status(200).json({ message: "Password reset email sent. Please check your inbox." });
         } catch (error) {
             if (error instanceof Error) {
@@ -160,7 +167,7 @@ export class AuthController {
                 res.status(400).json({ message: "No refresh token provided" });
             }
             const newAccessToken =
-                await this.authUseCase.refreshAccessToken(refreshToken);
+                await this.refreshAccessTokenUseCase.execute(refreshToken);
             this.setTokenCookie(res, CONFIG.ACCESS_TOKEN_COOKIE, newAccessToken);
 
             res.status(200).json({ message: "Token refreshed successfully" });

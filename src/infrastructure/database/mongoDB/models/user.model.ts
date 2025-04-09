@@ -1,5 +1,5 @@
 import mongoose, { Schema, Model, Document } from "mongoose";
-import { User as UserType } from "../../../../domain/entity/user";
+import { User as UserType } from "../../../../domain/entity/user.entity";
 
 type UserDocument = UserType & Document;
 

@@ -1,15 +1,14 @@
-// use repository as type from outer layer
+import { UserModel } from "../database/mongoDB/models/user.model";
 
-import { User } from "../../domain/entity/user"
+import { User } from "../../domain/entity/user.entity"
 import { UserRepository } from "../../domain/repository/user.repository"
-import { UserModel } from "../database/mongodb/models/user.model";
+
 
 export class MongoUserRepository implements UserRepository {
 
     create = async (user: User): Promise<User> => {
         const newUser = new UserModel(user);
         const savedUser = await newUser.save();
-
         return savedUser;
     }
 

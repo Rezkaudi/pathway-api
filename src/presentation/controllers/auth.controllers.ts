@@ -1,7 +1,5 @@
 
 import { Request, Response } from "express"
-import { LoginDTO, RegisterDTO, TokenDTO } from "../../application/dtos/user.dto";
-import { CONFIG } from "../config/env";
 import {
     LoginUseCase,
     RegisterUseCase,
@@ -11,6 +9,12 @@ import {
     RefreshAccessTokenUseCase
 } from "../../application/use-cases/auth";
 
+import { CONFIG } from "../config/env";
+import { ApiResponse } from "../../domain/interface/response";
+import { LoginDTO, RegisterDTO, ResetPasswordDTO, TokenDTO } from "../../application/dtos/user.dto";
+import { ForbiddenError } from "../../application/errors/application-error";
+import { ApplicationResponse } from "../../application/response/application-resposne";
+import { Messages, StatusCodes } from "../config/constant";
 
 export class AuthController {
     constructor(
@@ -43,17 +47,17 @@ export class AuthController {
                 password
             }
 
-            await this.registerUseCase.execute(registerData);
-            res.status(201).json({ message: "User registered successfully. Please check your email for verification." });
+            const verificationToken = await this.registerUseCase.execute(registerData);
+
+            return new ApplicationResponse(res, {
+                statusCode: StatusCodes.CREATED,
+                success: true,
+                data: { verificationToken },
+                message: Messages.REGISTER_SUCCESS
+            }).send()
 
         } catch (error) {
-            if (error instanceof Error) {
-                res.status(400)
-                throw new Error(error.message)
-                // res.status(400).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: "An unexpected error occurred" });
-            }
+            throw error
         }
     };
 
@@ -72,17 +76,15 @@ export class AuthController {
             this.setTokenCookie(res, CONFIG.ACCESS_TOKEN_COOKIE, accessToken);
             this.setTokenCookie(res, CONFIG.REFRESH_TOKEN_COOKIE, refreshToken);
 
-            res.status(200).json({ message: "Login successful" });
+            return new ApplicationResponse(res, {
+                statusCode: StatusCodes.OK,
+                success: true,
+                data: {},
+                message: Messages.LOGIN_SUCCESS
+            }).send()
+
         } catch (error) {
-            if (error instanceof Error) {
-                if (error.message === "Please verify your email before logging in") {
-                    res.status(403).json({ message: error.message });
-                } else {
-                    res.status(400).json({ message: error.message });
-                }
-            } else {
-                res.status(500).json({ message: "An unexpected error occurred" });
-            }
+            throw error
         }
     };
 
@@ -97,89 +99,106 @@ export class AuthController {
 
             res.clearCookie(CONFIG.ACCESS_TOKEN_COOKIE.name, cookieOptions);
             res.clearCookie(CONFIG.REFRESH_TOKEN_COOKIE.name, cookieOptions);
-            res.status(200).json({ message: "Logged out successfully" });
+
+            return new ApplicationResponse(res, {
+                statusCode: StatusCodes.OK,
+                success: true,
+                data: {},
+                message: Messages.LOGOUT_SUCCESS
+            }).send()
+
         } catch (error) {
-            if (error instanceof Error) {
-                res.status(400).json({ message: error.message });
-            }
+            throw error
         }
     };
 
     verifyEmail = async (req: Request, res: Response): Promise<void> => {
         try {
-            const { verificationToken } = req.body;
-            const { accessToken, refreshToken } = await this.verifyEmailUseCase.execute(verificationToken);
+            const { verificationToken } = req.query;
+            const { accessToken, refreshToken } = await this.verifyEmailUseCase.execute(verificationToken as string);
 
             this.setTokenCookie(res, CONFIG.ACCESS_TOKEN_COOKIE, accessToken);
             this.setTokenCookie(res, CONFIG.REFRESH_TOKEN_COOKIE, refreshToken);
 
-            res.status(200).redirect(`${CONFIG.FRONT_URL}/terms-of-use`);
+            return new ApplicationResponse(res, {
+                statusCode: StatusCodes.OK,
+                success: true,
+                data: {},
+                message: Messages.VERIFY_SUCCESS
+            }).send()
+
         } catch (error) {
-            if (error instanceof Error) {
-                if (error.message === "Invalid or expired verificationToken") {
-                    res.status(400).redirect(`${CONFIG.FRONT_URL}`);
-                } else {
-                    res.status(400).json({ message: error.message });
-                }
-            } else {
-                res.status(500).json({ message: "An unexpected error occurred" });
-            }
+            throw error
         }
     };
 
     resetPassword = async (req: Request, res: Response): Promise<void> => {
         try {
-            const { newPassword, verificationToken } = req.body;
-            await this.resetPasswordUseCase.execute({ verificationToken, newPassword });
+            const { verificationToken } = req.query;
+            const { newPassword } = req.body;
 
-            res.status(200).json({ message: "Password reset successfully. You can now log in with your new password." });
+            await this.resetPasswordUseCase.execute({ verificationToken, newPassword } as ResetPasswordDTO);
+
+            return new ApplicationResponse(res, {
+                statusCode: StatusCodes.OK,
+                success: true,
+                data: {},
+                message: Messages.RESET_PASSWORD_SUCCESS
+            }).send()
+
         } catch (error) {
-            if (error instanceof Error) {
-                res.status(400).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: "An unexpected error occurred" });
-            }
+            throw error
         }
     };
 
     forgotPassword = async (req: Request, res: Response): Promise<void> => {
         try {
             const { email } = req.body;
-            await this.forgotPasswordUseCase.execute(email);
-            res.status(200).json({ message: "Password reset email sent. Please check your inbox." });
-        } catch (error) {
-            if (error instanceof Error) {
-                res.status(400).json({ message: error.message });
-            } else {
-                res.status(500).json({ message: "An unexpected error occurred" });
-            }
-        }
-    };
 
-    resendVerificationCode = async (req: Request, res: Response): Promise<void> => {
-        this.forgotPassword(req, res)
+            const verificationToken = await this.forgotPasswordUseCase.execute(email);
+
+            return new ApplicationResponse(res, {
+                statusCode: StatusCodes.OK,
+                success: true,
+                data: { verificationToken },
+                message: Messages.FORGOT_PASSWORD_SUCCESS
+            }).send()
+
+        } catch (error) {
+            throw error
+        }
     };
 
     refreshAccessToken = async (req: Request, res: Response): Promise<void> => {
         try {
             const refreshToken = req.cookies[CONFIG.REFRESH_TOKEN_COOKIE.name];
+
             if (!refreshToken) {
-                res.status(400).json({ message: "No refresh token provided" });
+                throw new ForbiddenError()
             }
-            const newAccessToken =
-                await this.refreshAccessTokenUseCase.execute(refreshToken);
+            const newAccessToken = await this.refreshAccessTokenUseCase.execute(refreshToken);
+
             this.setTokenCookie(res, CONFIG.ACCESS_TOKEN_COOKIE, newAccessToken);
 
-            res.status(200).json({ message: "Token refreshed successfully" });
+            return new ApplicationResponse(res, {
+                statusCode: StatusCodes.OK,
+                success: true,
+                data: {},
+                message: Messages.REFRESH_TOKEN_SUCCESS
+            }).send()
+
         } catch (error) {
-            if (error instanceof Error) {
-                res.status(400).json({ message: error.message });
-            }
+            throw new ForbiddenError((error as any).message)
         }
     }
 
     checkAuth = async (req: Request, res: Response): Promise<void> => {
-        res.json({ isAuthenticated: !!(req as any).user })
+        return new ApplicationResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            data: { isAuthenticated: !!(req as any).user },
+            message: ""
+        }).send()
     };
 }
 

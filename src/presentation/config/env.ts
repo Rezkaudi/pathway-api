@@ -37,7 +37,7 @@ export const CONFIG = {
 
     REFRESH_TOKEN_COOKIE: {
         name: "refreshToken",
-        age: 7 * 24 * 60 * 60 * 1000,// 1 day
+        age: 7 * 24 * 60 * 60 * 1000,// 7 day
     },
 
     SALT_ROUNDS_BCRYPT: 10

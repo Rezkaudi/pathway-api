@@ -3,6 +3,7 @@ import { CONFIG } from "../config/env";
 import { Request, Response, NextFunction } from 'express';
 import { TokenService } from "../../domain/services/token.service";
 import { UserRepository } from "../../domain/repository/user.repository";
+import { BadRequestError, ForbiddenError, UnauthorizedError } from "../../application/errors/application-error";
 
 declare global {
     namespace Express {
@@ -14,12 +15,13 @@ declare global {
 
 // Define a regex pattern for paths that should be excluded
 const excludedPaths = [
-    "/api/auth/refresh",
+    "/api/auth/refresh-token",
     "/api/auth/register",
     "/api/auth/login",
     "/api/auth/verify-email",
     "/api/auth/forgot-password",
     "/api/auth/reset-password",
+    "/api/auth/check-auth",
 ];
 
 export const authMiddleware = (tokenService: TokenService, userRepository: UserRepository) => {
@@ -37,34 +39,27 @@ export const authMiddleware = (tokenService: TokenService, userRepository: UserR
         const refreshToken = req.cookies[CONFIG.REFRESH_TOKEN_COOKIE.name];
 
         if (!refreshToken) {
-            console.log("Unauthorized, no refresh token");
-            res.status(403).json({ error: "Forbidden" });
+            throw new ForbiddenError()
         }
 
         if (!accessToken) {
-            console.log("Unauthorized");
-            res.status(401).json({ error: "Unauthorized" });
+            throw new UnauthorizedError()
         }
 
         try {
-            const decoded = (await tokenService.verify(
-                accessToken,
-                CONFIG.JWT_SECRET,
-            )) as {
-                userId: string;
-            };
-            const user = await userRepository.findById(decoded.userId);
+            const { userId } = await tokenService.verify(accessToken, CONFIG.JWT_SECRET_ACCESS_TOKEN.token) as { userId: string }
+
+            const user = await userRepository.findById(userId);
+
             if (user) {
-                (req as any).user = user;
+                req.user = user
                 next();
             } else {
-                res.status(401).json({ error: "User not found" });
+                throw new BadRequestError("User Not Found")
             }
+
         } catch (error) {
-            res.status(401).json({
-                success: false,
-                message: "Authentication failed"
-            });
+            throw new UnauthorizedError((error as any).message)
         }
     };
 };

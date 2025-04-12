@@ -10,11 +10,7 @@ export class JwtTokenService implements TokenService {
     }
 
     verify = async (token: string, key: string): Promise<object | null> => {
-        try {
-            const decoded = jwt.verify(token, key as Secret) as object;
-            return decoded;
-        } catch {
-            return null;
-        }
+        const decoded = jwt.verify(token, key as Secret) as object;
+        return decoded;
     }
 }

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { body, validationResult } from 'express-validator';
+import { body, check, param, validationResult } from 'express-validator';
 
 export const validateRequest = (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
@@ -38,24 +38,21 @@ export const registerValidator = [
 ];
 
 export const verifyEmailValidator = [
-    body("verificationToken").notEmpty().withMessage("verificationToken is required"),
+    check('verificationToken')
+        .exists()
+        .withMessage('Verification token is required'),
     validateRequest,
 ]
 
 export const resetPasswordValidator = [
-    body("verificationToken").notEmpty().withMessage("verificationToken is required"),
+    check('verificationToken')
+        .exists()
+        .withMessage('Verification token is required'),
     body("newPassword").notEmpty().withMessage('Password is required'),
     validateRequest,
 ]
 
 export const forgotPasswordValidator = [
-    body('email').
-        isEmail().withMessage('Email must be valid').
-        notEmpty().withMessage('Email is required'),
-    validateRequest,
-]
-
-export const resendVerificationCodeValidator = [
     body('email').
         isEmail().withMessage('Email must be valid').
         notEmpty().withMessage('Email is required'),

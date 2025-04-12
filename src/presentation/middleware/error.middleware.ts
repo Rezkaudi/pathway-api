@@ -1,28 +1,34 @@
 import { Request, Response, NextFunction } from 'express';
 
 import { ApplicationError } from '../../application/errors/application-error';
+import { ApplicationResponse } from '../../application/response/application-resposne';
 
 
 export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
 
     if (err instanceof ApplicationError) {
-        res.status(err.statusCode).json({
+        return new ApplicationResponse(res, {
             statusCode: err.statusCode,
+            success: false,
             message: err.message,
-            ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
-        });
+            data: { ...(process.env.NODE_ENV === 'development' && { stack: err.stack }) },
+        }).send()
     }
 
-    res.status(500).json({
+    return new ApplicationResponse(res, {
         statusCode: 500,
-        message: 'Internal Server Error'
-    });
+        success: false,
+        message: err.message || 'Internal Server Error',
+        data: { ...(process.env.NODE_ENV === 'development' && { stack: err.stack }) },
+    }).send()
 
 };
 
 export const notFoundHandler = (req: Request, res: Response) => {
-    res.status(404).json({
+    return new ApplicationResponse(res, {
         statusCode: 404,
+        success: false,
         message: `Not Found - ${req.originalUrl}`,
-    });
+        data: {}
+    }).send()
 };

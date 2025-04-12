@@ -28,6 +28,8 @@ import { RootController } from '../controllers/root.controllers';
 export const setupDependencies = () => {
 
     const frontEndUrl = CONFIG.FRONT_URL
+    const serverUrl = CONFIG.SERVER_URL
+
     const secretAccessToken = CONFIG.JWT_SECRET_ACCESS_TOKEN
     const secretRefreshToken = CONFIG.JWT_SECRET_REFRESH_TOKEN
 
@@ -48,7 +50,7 @@ export const setupDependencies = () => {
     );
 
     const registerUseCase = new RegisterUseCase(
-        frontEndUrl,
+        serverUrl,
         emailService,
         userRepository,
         encryptionService,

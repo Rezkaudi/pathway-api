@@ -21,6 +21,13 @@ export class BadRequestError extends ApplicationError {
     }
 }
 
+export class ConflictRequestError extends ApplicationError {
+    constructor(message: string = 'Conflict request') {
+        super(message, 409);
+    }
+}
+
+
 export class UnauthorizedError extends ApplicationError {
     constructor(message: string = 'Unauthorized') {
         super(message, 401);

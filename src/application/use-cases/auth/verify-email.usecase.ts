@@ -1,4 +1,6 @@
 
+import { BadRequestError } from "../../errors/application-error";
+
 import { AuthResposnseDTO, SecretTokenDTO } from "../../dtos/user.dto";
 
 import { TokenService } from "../../../domain/services/token.service";
@@ -20,12 +22,13 @@ export class VerifyEmailUseCase {
         const user = await this.userRepository.findByVerificationToken(verificationToken);
 
         if (!user) {
-            throw new Error("Invalid or expired token");
+            throw new BadRequestError("Invalid or expired verificationToken");
         }
 
         await this.userRepository.update(user._id!, {
             isVerified: true,
             verificationToken: null,
+            verificationTokenExpiresAt: null
         });
 
         const accessToken = await this.tokenService.generate({ userId: user._id }, this.secretAccessToken.token, this.secretAccessToken.age);

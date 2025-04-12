@@ -2,6 +2,7 @@
 import { SecretTokenDTO } from "../../dtos/user.dto";
 
 import { TokenService } from "../../../domain/services/token.service";
+import { ForbiddenError } from "../../errors/application-error";
 
 
 export class RefreshAccessTokenUseCase {
@@ -14,12 +15,13 @@ export class RefreshAccessTokenUseCase {
     ) { }
 
     execute = async (refreshToken: string): Promise<string> => {
-        const decoded = (await this.tokenService.verify(refreshToken, this.secretRefreshToken.token)) as { userId: string } | null;
 
-        if (!decoded || !decoded.userId) {
-            throw new Error("Invalid refresh token");
+        const { userId } = await this.tokenService.verify(refreshToken, this.secretRefreshToken.token) as { userId: string }
+
+        if (!userId) {
+            throw new ForbiddenError()
         }
 
-        return await this.tokenService.generate({ userId: decoded.userId }, this.secretAccessToken.token, this.secretAccessToken.age);
+        return await this.tokenService.generate({ userId }, this.secretAccessToken.token, this.secretAccessToken.age);
     }
 }

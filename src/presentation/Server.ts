@@ -21,7 +21,6 @@ export default class Server {
     private app: Express;
     private container = setupDependencies();
 
-
     constructor() {
         this.app = express();
         this.setupMiddleware();

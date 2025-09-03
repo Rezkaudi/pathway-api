@@ -7,4 +7,5 @@ export interface Attachment {
 
 export interface MailService {
     send(to: string, subject: string, template: string, attachments?: Attachment[]): Promise<void>;
+    verify(): Promise<void>
 }

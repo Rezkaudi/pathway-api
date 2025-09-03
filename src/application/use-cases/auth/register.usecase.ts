@@ -49,6 +49,7 @@ export class RegisterUseCase {
             verificationTokenExpiresAt: this.verificationTokenExpiresAt,
         }
 
+        await this.emailService.verify()
         await this.userRepository.create(user);
 
         // send verification email

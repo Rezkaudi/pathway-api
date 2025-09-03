@@ -5,6 +5,9 @@ export const allowedOrigins = [
     'http://localhost:8080',
     'https://protein-pathway.vercel.app',
     'https://clean-architcture-express.vercel.app',
+    'https://pathway-repo.alpha.kb-tohsa.org',
+    'https://pathway-db.alpha.kb-tohsa.org',
+    'https://pathway-api.alpha.kb-tohsa.org'
 ];
 
 export const corsOptions: CorsOptions = {

@@ -23,6 +23,7 @@ export default class Database {
             password: CONFIG.POSTGRES_PASSWORD,
             port: CONFIG.POSTGRES_PORT as number,
             ssl: { rejectUnauthorized: false },
+            // ssl: false,
             max: 10,
             idleTimeoutMillis: 30000,
             connectionTimeoutMillis: 10000,

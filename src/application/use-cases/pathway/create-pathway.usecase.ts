@@ -10,11 +10,11 @@ export class CreatePathwayUseCase {
         private readonly uuidGeneratorService: UuidGeneratorService,
     ) { }
 
-    execute = async (data: Pathway): Promise<Pathway | null> => {
+    execute = async (data: Partial<Pathway>): Promise<Pathway | null> => {
 
         const pathwayData: Pathway = {
             _id: this.uuidGeneratorService.generate(),
-            userId: data.userId,
+            userId: data.userId as string,
             title: data.title || null,
             description: data.description || null,
             species: data.species || null,
@@ -24,7 +24,9 @@ export class CreatePathwayUseCase {
             diseaseInput: data.diseaseInput || null,
             reactions: data.reactions || null,
             recordDate: data.recordDate || null,
-            pubMeds: data.pubMeds || []
+            pubMeds: data.pubMeds || [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
         }
 
         const pathway = await this.pathwayRepository.create(pathwayData);

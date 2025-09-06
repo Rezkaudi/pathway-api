@@ -1,4 +1,4 @@
-import { CONFIG } from '../config/env';
+import { CONFIG } from '../config/env.config';
 
 // Srevices
 import { JwtTokenService } from '../../infrastructure/srevices/jwt-token.service';
@@ -7,11 +7,9 @@ import { UuidGeneratorService } from '../../infrastructure/srevices/uuid-generat
 import { NodemailerGmailService } from '../../infrastructure/srevices/nodemailer-gmail.service';
 import { CryptoRandomStringGenerator } from '../../infrastructure/srevices/crypto-random-string-generator';
 
-
 // Repositories
-import { MongoUserRepository } from '../../infrastructure/repository/mongo-user.repository';
-import { PostgreSQLUserRepository } from '../../infrastructure/repository/postgresql-user.repository';
-import { PostgreSQLPathwayRepository } from '../../infrastructure/repository/postgresql-pathway.repository';
+import { PostgreSQLUserRepository } from '../../infrastructure/database/repository/postgresql-user.repository';
+import { PostgreSQLPathwayRepository } from '../../infrastructure/database/repository/postgresql-pathway.repository';
 
 // Use Cases
 import {
@@ -59,7 +57,6 @@ export const setupDependencies = () => {
     // Repositories
     const userRepository = new PostgreSQLUserRepository();
     const pathwayRepository = new PostgreSQLPathwayRepository();
-    // const userRepository = new MongoUserRepository();
 
     // Services
     const tokenService = new JwtTokenService()

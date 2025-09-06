@@ -1,18 +1,19 @@
 export interface User {
-    _id?: string,
+    _id: string,
     email: string;
     password: string;
     firstName: string;
     lastName: string;
     isVerified: boolean;
-    biography: string | null,
-    phoneNumber: string | null,
-    degree: string | null,
-    university: string | null,
+
+    biography?: string | null,
+    phoneNumber?: string | null,
+    degree?: string | null,
+    university?: string | null,
     links: {
         type: string,
         url: string
-    }[] | null,
+    }[],
 
     profileImageUrl?: string | null;
     verificationToken?: string | null;
@@ -20,4 +21,7 @@ export interface User {
 
     resetPasswordToken?: string | null;
     resetPasswordTokenExpiresAt?: Date | null;
+
+    createdAt: Date;
+    updatedAt: Date
 }

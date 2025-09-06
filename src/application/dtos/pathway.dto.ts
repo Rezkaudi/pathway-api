@@ -25,10 +25,10 @@ export interface PathwayWithPaginationDTO {
 
 export interface PathwayResponseDTO {
     _id: string,
-    title: string | null;
-    species: string | null;
-    category: string | null;
-    recordDate: string | null,
+    title?: string | null;
+    species?: string | null;
+    category?: string | null;
+    recordDate?: string | null,
 }
 
 export interface FilterPathwayDTO {

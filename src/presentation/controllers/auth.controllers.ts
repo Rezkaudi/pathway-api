@@ -11,8 +11,8 @@ import {
     ResendVerificationUseCase
 } from "../../application/use-cases/auth";
 
-import { CONFIG } from "../config/env";
-import { Messages, StatusCodes } from "../config/constant";
+import { CONFIG } from "../config/env.config";
+import { Messages, StatusCodes } from "../config/constant.config";
 
 import { LoginDTO, RegisterDTO, ResetPasswordDTO, TokenDTO, UpdatePasswordDTO } from "../../application/dtos/user.dto";
 

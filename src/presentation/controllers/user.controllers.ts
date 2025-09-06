@@ -1,8 +1,8 @@
 
 import { Request, Response } from "express"
 
-import { CONFIG } from "../config/env";
-import { Messages, StatusCodes } from "../config/constant";
+import { CONFIG } from "../config/env.config";
+import { Messages, StatusCodes } from "../config/constant.config";
 
 import {
     GetUserInfoUseCase,
@@ -13,6 +13,7 @@ import {
 import { UserInfoDTO } from "../../application/dtos/user.dto";
 
 import { ApplicationResponse } from "../../application/response/application-resposne";
+import { User } from "../../domain/entity/user.entity";
 
 
 export class UserController {
@@ -45,7 +46,7 @@ export class UserController {
             const userId = req.user._id
             const { profileImageUrl, firstName, lastName, biography, email, phoneNumber, degree, university, links } = req.body;
 
-            const updatedUserData: Partial<UserInfoDTO> = {
+            const updatedUserData: Partial<User> = {
                 ...(firstName && { firstName }),
                 ...(lastName && { lastName }),
                 ...(biography !== undefined && { biography }),

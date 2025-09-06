@@ -63,7 +63,9 @@ export class CreateMockPathwaysUseCase {
                 tissue: JSON.stringify(generateTissue()) as any,
                 diseaseInput: JSON.stringify(generateDiseaseInput()) as any,
                 reactions: JSON.stringify(generateReactions(faker.number.int({ min: 1, max: 4 }))),
-                pubMeds: JSON.stringify([{ id: "111" }, { id: "222" }]) as any
+                pubMeds: JSON.stringify([{ id: "111" }, { id: "222" }]) as any,
+                createdAt: new Date(),
+                updatedAt: new Date(),
             };
 
             await this.pathwayRepository.create(pathwayData);

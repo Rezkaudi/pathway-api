@@ -11,9 +11,6 @@ export const CONFIG = {
     GMAIL_USER: process.env.GMAIL_USER,
     GMAIL_PASS: process.env.GMAIL_PASS,
 
-    DEV_MONGODB_URI: process.env.DEV_MONGODB_URI,
-    DEV_POSTGRESQL_URI: process.env.DEV_POSTGRESQL_URI,
-
     POSTGRES_USER: process.env.POSTGRES_USER,
     POSTGRES_HOST: process.env.POSTGRES_HOST,
     POSTGRES_PASSWORD: process.env.POSTGRES_PASSWORD,

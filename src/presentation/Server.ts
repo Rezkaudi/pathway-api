@@ -3,8 +3,8 @@ import cookieParser from 'cookie-parser';
 import express, { Express } from "express";
 import swaggerUi from 'swagger-ui-express';
 
-import { CONFIG } from "./config/env";
-import swaggerSpec from './config/swagger';
+import { CONFIG } from "./config/env.config";
+import swaggerSpec from './config/swagger.config';
 
 import { logger } from './middleware/logger.middleware';
 import { authMiddleware } from './middleware/auth.middleware';
@@ -17,7 +17,7 @@ import userPathwayRoutes from './routes/user-pathway.routes';
 import publicPathwayRoutes from './routes/pubic-pathway.routes';
 
 import { setupDependencies } from './dependencies';
-import { corsOptions } from "./config/corsOptions";
+import { corsOptions } from "./config/cors.config";
 
 export default class Server {
     private app: Express;

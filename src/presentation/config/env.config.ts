@@ -4,15 +4,12 @@ dotenv.config();
 
 export const CONFIG = {
     NODE_ENV: process.env.NODE_ENV || "development",
-    FRONT_URL: process.env.FRONT_URL || "http://localhost:3000",
+    FRONT_URL: process.env.FRONT_URL || "http://localhost:5173",
     SERVER_URL: process.env.SERVER_URL || "http://localhost:8080",
     PORT: process.env.PORT || 8080,
 
-    GMAIL_USER: process.env.GMAIL_USER,
-    GMAIL_PASS: process.env.GMAIL_PASS,
-
-    DEV_MONGODB_URI: process.env.DEV_MONGODB_URI,
-    DEV_POSTGRESQL_URI: process.env.DEV_POSTGRESQL_URI,
+    GMAIL_USER: process.env.GMAIL_USER!,
+    GMAIL_PASS: process.env.GMAIL_PASS!,
 
     POSTGRES_USER: process.env.POSTGRES_USER,
     POSTGRES_HOST: process.env.POSTGRES_HOST,

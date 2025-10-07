@@ -32,9 +32,12 @@ export class ForgotPasswordUseCase {
         const resetPasswordUrl = `${this.frontEndUrl}/reset-password/reset?token=${resetPasswordToken}`
         const subject = "Reset Password Verification"
         const template = `
-        <h4>Please Reset Password</h4>
-        <p>Click the link below to Reset Password:</p>
-        <a href="${resetPasswordUrl}">Reset Password</a>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #57369E;">Password Reset Request</h1>
+          <p>We received a request to reset your password. Click the button below to create a new password:</p>
+          <a href="${resetPasswordUrl}" style="display: inline-block; background-color: #57369E; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-top: 20px;">Reset Password</a>
+          <p style="color: #666; margin-top: 20px;">This link will expire in 1 hour. If you didn't request this, please ignore this email.</p>
+        </div>
     `;
 
         await this.emailService.send(email, subject, template)

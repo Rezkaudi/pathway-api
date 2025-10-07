@@ -1,13 +1,11 @@
 
 import Server from "./presentation/Server";
-import Database from "./infrastructure/database/postgreSQL";
+import { AppDataSource } from "./infrastructure/database/config/database.config";
 
 async function main() {
     try {
         const server = new Server();
-        const db = Database.getInstance();
-
-        await db.connect();
+        await AppDataSource.initialize();
 
         server.init();
         await server.run();

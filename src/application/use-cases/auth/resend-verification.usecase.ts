@@ -43,9 +43,11 @@ export class ResendVerificationUseCase {
         const verifyUrl = `${this.ServerUrl}/api/auth/verify-email?verificationToken=${verificationToken}`
         const subject = "Verify Your Email";
         const template = `
-            <h4>Please Verify Your Email</h4>
-            <p>Click the link below to verify your email:</p>
-            <a href="${verifyUrl}">Verify Email</a>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #57369E;">Please Verify Your Email</h1>
+          <p>Thank you for joining us! Please this verification link below to continue your registration:</p>
+          <a href="${verifyUrl}" style="display: inline-block; background-color: #57369E; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-top: 20px;">Verify Email</a>
+        </div>
         `;
 
         await this.emailService.send(email, subject, template)

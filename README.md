@@ -475,7 +475,7 @@ CREATE TABLE pathways (
 
 ```env
 NODE_ENV=development
-FRONT_URL=http://localhost:3000
+FRONT_URL=http://localhost:5173
 SERVER_URL=http://localhost:8080
 PORT=8080
 

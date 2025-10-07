@@ -9,4 +9,5 @@ export interface PathwayRepository {
     findById(id: string): Promise<Pathway | null>;
     findByUserId(userId: string, limit: number, offset: number, filters: FilterPathwayDTO): Promise<PathwayWithPaginationDTO>;
     update(id: string, pathway: Partial<Pathway>): Promise<Pathway | null>;
+    getAllIds(id: string): Promise<string[]>;
 }

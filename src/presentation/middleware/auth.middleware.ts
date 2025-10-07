@@ -1,4 +1,4 @@
-import { CONFIG } from "../config/env";
+import { CONFIG } from "../config/env.config";
 
 import { Request, Response, NextFunction } from 'express';
 import { TokenService } from "../../domain/services/token.service";

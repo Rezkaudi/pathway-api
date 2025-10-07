@@ -6,6 +6,8 @@ const publicPathwayRoutes = (pathwayController: PathwayController): Router => {
 
     router.get('/', pathwayController.getAllPathways.bind(pathwayController));
     router.get('/:id', pathwayController.getPathwayById.bind(pathwayController));
+    router.get('/:id/export-to-json', pathwayController.exportPathwayToJSON.bind(pathwayController));
+
 
     return router;
 };

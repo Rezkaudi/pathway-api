@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import { Messages, StatusCodes } from "../config/constant";
+import { Messages, StatusCodes } from "../config/constant.config";
 
 import {
     CreatePathwayUseCase,
@@ -9,11 +9,13 @@ import {
     GetAllPathwaysUseCase,
     GetPathwayByIdUseCase,
     GetAllUserPathwaysUseCase,
-    CreateMockPathwaysUseCase
+    CreateMockPathwaysUseCase,
+    ExportPathwayUseCase
 } from "../../application/use-cases/pathway";
 
 import { ApplicationResponse } from "../../application/response/application-resposne";
 import { FilterPathwayDTO } from "../../application/dtos/pathway.dto";
+import { Pathway } from "../../domain/entity/pathway.entity";
 
 export class PathwayController {
     constructor(
@@ -24,6 +26,7 @@ export class PathwayController {
         private readonly getPathwayByIdUseCase: GetPathwayByIdUseCase,
         private readonly getAllUserPathwaysUseCase: GetAllUserPathwaysUseCase,
         private readonly createMockPathwaysUseCase: CreateMockPathwaysUseCase,
+        private readonly exportPathwayUseCase: ExportPathwayUseCase
     ) { }
 
     createPathway = async (req: Request, res: Response): Promise<void> => {
@@ -31,7 +34,7 @@ export class PathwayController {
             const userId = req.user._id;
             const { title, description, species, category, tissue, relatedDisease, diseaseInput, reactions, recordDate, pubMeds } = req.body;
 
-            const pathwayData = {
+            const pathwayData: Partial<Pathway> = {
                 userId,
                 title,
                 description,
@@ -131,6 +134,7 @@ export class PathwayController {
             const { id } = req.params;
 
             const pathway = await this.getPathwayByIdUseCase.execute(id);
+            console.log(pathway)
 
             return new ApplicationResponse(res, {
                 statusCode: StatusCodes.OK,
@@ -149,7 +153,6 @@ export class PathwayController {
             const userId = req.user._id as string;
 
             const pathway = await this.getPathwayByIdUseCase.execute(id);
-
             return new ApplicationResponse(res, {
                 statusCode: StatusCodes.OK,
                 success: true,
@@ -226,7 +229,6 @@ export class PathwayController {
         }
     };
 
-
     updatePathway = async (req: Request, res: Response): Promise<void> => {
         try {
             const { id } = req.params;
@@ -252,6 +254,23 @@ export class PathwayController {
                 success: true,
                 data: { pathway },
                 message: Messages.UPDATE_PATHWAY_SUCCESS
+            }).send();
+        } catch (error) {
+            throw error
+        }
+    };
+
+    exportPathwayToJSON = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const { id } = req.params;
+
+            const pathway = await this.exportPathwayUseCase.execute(id);
+
+            return new ApplicationResponse(res, {
+                statusCode: StatusCodes.OK,
+                success: true,
+                data: { pathway },
+                message: Messages.GET_PATHWAY_SUCCESS
             }).send();
         } catch (error) {
             throw error

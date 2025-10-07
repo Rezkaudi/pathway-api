@@ -5,5 +5,5 @@ export * from './get-all-pathways.usecase';
 export * from './get-all-user-pathways.usecase';
 export * from './get-pathway-by-id.usecase';
 export * from './create-muck-pathway.usecase';
-
+export * from './export-pathway.usecase';
 

@@ -2,6 +2,7 @@
 import { UserInfoDTO } from "../../dtos/user.dto";
 
 import { UserRepository } from "../../../domain/repository/user.repository";
+import { User } from "../../../domain/entity/user.entity";
 
 export class UpdateUserInfoUseCase {
 
@@ -9,7 +10,7 @@ export class UpdateUserInfoUseCase {
         private readonly userRepository: UserRepository,
     ) { }
 
-    execute = async (userId: string, updatedUserData: Partial<UserInfoDTO>): Promise<UserInfoDTO | null> => {
+    execute = async (userId: string, updatedUserData: Partial<User>): Promise<UserInfoDTO | null> => {
         const user = await this.userRepository.update(userId, updatedUserData);
 
         const userData: UserInfoDTO = {

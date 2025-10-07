@@ -1,3 +1,4 @@
 export interface IdGeneratorService {
-    generate(): string;
+    generateNextIdForUser(): Promise<string>;
+    generateNextIdForPathway(): Promise<string>;
 }

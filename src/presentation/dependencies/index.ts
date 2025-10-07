@@ -1,17 +1,15 @@
-import { CONFIG } from '../config/env';
+import { CONFIG } from '../config/env.config';
 
 // Srevices
 import { JwtTokenService } from '../../infrastructure/srevices/jwt-token.service';
 import { BcryptPasswordHasher } from '../../infrastructure/srevices/bcrypt-password-hasher';
-import { UuidGeneratorService } from '../../infrastructure/srevices/uuid-generator.service';
+import { IdOrderedGeneratorService } from '../../infrastructure/srevices/id-ordered-generator.service';
 import { NodemailerGmailService } from '../../infrastructure/srevices/nodemailer-gmail.service';
 import { CryptoRandomStringGenerator } from '../../infrastructure/srevices/crypto-random-string-generator';
 
-
 // Repositories
-import { MongoUserRepository } from '../../infrastructure/repository/mongo-user.repository';
-import { PostgreSQLUserRepository } from '../../infrastructure/repository/postgresql-user.repository';
-import { PostgreSQLPathwayRepository } from '../../infrastructure/repository/postgresql-pathway.repository';
+import { PostgreSQLUserRepository } from '../../infrastructure/database/repository/postgresql-user.repository';
+import { PostgreSQLPathwayRepository } from '../../infrastructure/database/repository/postgresql-pathway.repository';
 
 // Use Cases
 import {
@@ -39,6 +37,7 @@ import {
     GetPathwayByIdUseCase,
     GetAllUserPathwaysUseCase,
     CreateMockPathwaysUseCase,
+    ExportPathwayUseCase
 } from '../../application/use-cases/pathway';
 
 // Controllers
@@ -50,49 +49,42 @@ import { PathwayController } from '../controllers/pathway.controllers';
 
 export const setupDependencies = () => {
 
-    const frontEndUrl = CONFIG.FRONT_URL
-    const serverUrl = CONFIG.SERVER_URL
-
-    const secretAccessToken = CONFIG.JWT_SECRET_ACCESS_TOKEN
-    const secretRefreshToken = CONFIG.JWT_SECRET_REFRESH_TOKEN
-
     // Repositories
     const userRepository = new PostgreSQLUserRepository();
     const pathwayRepository = new PostgreSQLPathwayRepository();
-    // const userRepository = new MongoUserRepository();
 
     // Services
     const tokenService = new JwtTokenService()
-    const uuidGeneratorService = new UuidGeneratorService()
+    const idOrderedGeneratorService = new IdOrderedGeneratorService(userRepository, pathwayRepository)
     const randomStringGenerator = new CryptoRandomStringGenerator()
     const encryptionService = new BcryptPasswordHasher(CONFIG.SALT_ROUNDS_BCRYPT)
-    const emailService = new NodemailerGmailService(CONFIG.GMAIL_USER!, CONFIG.GMAIL_PASS!)
+    const emailService = new NodemailerGmailService(CONFIG.GMAIL_USER, CONFIG.GMAIL_PASS)
 
     // Use Cases
 
     // 1- Auth
     const loginUseCase = new LoginUseCase(
-        secretAccessToken,
-        secretRefreshToken,
+        CONFIG.JWT_SECRET_ACCESS_TOKEN,
+        CONFIG.JWT_SECRET_REFRESH_TOKEN,
         tokenService,
         userRepository,
         encryptionService
     );
 
     const registerUseCase = new RegisterUseCase(
-        serverUrl,
+        CONFIG.SERVER_URL,
         emailService,
         userRepository,
         encryptionService,
-        uuidGeneratorService,
+        idOrderedGeneratorService,
         randomStringGenerator
     );
 
     const verifyEmailUseCase = new VerifyEmailUseCase(
         tokenService,
         userRepository,
-        secretAccessToken,
-        secretRefreshToken
+        CONFIG.JWT_SECRET_ACCESS_TOKEN,
+        CONFIG.JWT_SECRET_REFRESH_TOKEN
     );
 
     const resetPasswordUseCase = new ResetPasswordUseCase(
@@ -102,7 +94,7 @@ export const setupDependencies = () => {
 
 
     const forgotPasswordUseCase = new ForgotPasswordUseCase(
-        frontEndUrl,
+        CONFIG.FRONT_URL,
         emailService,
         userRepository,
         randomStringGenerator
@@ -110,8 +102,8 @@ export const setupDependencies = () => {
 
     const refreshAccessTokenUseCase = new RefreshAccessTokenUseCase(
         tokenService,
-        secretAccessToken,
-        secretRefreshToken,
+        CONFIG.JWT_SECRET_ACCESS_TOKEN,
+        CONFIG.JWT_SECRET_REFRESH_TOKEN,
     );
 
     const updatePasswordUseCase = new UpdatePasswordUseCase(
@@ -120,7 +112,7 @@ export const setupDependencies = () => {
     );
 
     const resendVerificationUseCase = new ResendVerificationUseCase(
-        serverUrl,
+        CONFIG.SERVER_URL,
         emailService,
         userRepository,
         randomStringGenerator
@@ -142,12 +134,12 @@ export const setupDependencies = () => {
     // 3- Pathway
     const createPathwayUseCase = new CreatePathwayUseCase(
         pathwayRepository,
-        uuidGeneratorService
+        idOrderedGeneratorService
     )
 
     const createMockPathwaysUseCase = new CreateMockPathwaysUseCase(
         pathwayRepository,
-        uuidGeneratorService
+        idOrderedGeneratorService
     )
 
     const deletePathwayUseCase = new DeletePathwayUseCase(
@@ -170,6 +162,10 @@ export const setupDependencies = () => {
         pathwayRepository
     )
 
+    const exportPathwayUseCase = new ExportPathwayUseCase(
+        pathwayRepository
+    )
+
     // Controllers
     const authController = new AuthController(
         loginUseCase,
@@ -179,13 +175,14 @@ export const setupDependencies = () => {
         forgotPasswordUseCase,
         refreshAccessTokenUseCase,
         updatePasswordUseCase,
-        resendVerificationUseCase
+        resendVerificationUseCase,
+        CONFIG.FRONT_URL,
     );
 
     const userController = new UserController(
         getUserInfoUseCase,
         updateUserInfoUseCase,
-        deleteUserAccountUseCase,
+        deleteUserAccountUseCase
     );
 
     const pathwayController = new PathwayController(
@@ -195,7 +192,8 @@ export const setupDependencies = () => {
         getAllPathwaysUseCase,
         getPathwayByIdUseCase,
         getAllUserPathwaysUseCase,
-        createMockPathwaysUseCase
+        createMockPathwaysUseCase,
+        exportPathwayUseCase
     );
 
 

@@ -20,7 +20,7 @@ import { setupDependencies } from './dependencies';
 import { corsOptions } from "./config/cors.config";
 
 export default class Server {
-    private app: Express;
+    public app: Express;
     private container: any;
 
     constructor() {
@@ -59,11 +59,12 @@ export default class Server {
         });
     }
 
-    public init(): void {
+    public init(): Express {
         this.app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
         this.container = setupDependencies()
         this.setupMiddleware();
         this.setupRoutes();
         this.setupErrorHandlers();
+        return this.app;
     }
 }

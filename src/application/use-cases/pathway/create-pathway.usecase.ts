@@ -1,19 +1,19 @@
 import { Pathway } from "../../../domain/entity/pathway.entity";
 import { PathwayRepository } from "../../../domain/repository/pathway.repository";
+import { IdGeneratorService } from "../../../domain/services/id-generator.service";
 
-import { UuidGeneratorService } from "../../../infrastructure/srevices/uuid-generator.service";
 
 export class CreatePathwayUseCase {
 
     constructor(
         private readonly pathwayRepository: PathwayRepository,
-        private readonly uuidGeneratorService: UuidGeneratorService,
+        private readonly idOrderedGeneratorService: IdGeneratorService,
     ) { }
 
     execute = async (data: Partial<Pathway>): Promise<Pathway | null> => {
 
         const pathwayData: Pathway = {
-            _id: this.uuidGeneratorService.generate(),
+            _id: `HGA_PR_${await this.idOrderedGeneratorService.generateNextIdForPathway()}`,
             userId: data.userId as string,
             title: data.title || null,
             description: data.description || null,

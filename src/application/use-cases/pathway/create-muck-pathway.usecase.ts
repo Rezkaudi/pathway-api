@@ -2,14 +2,14 @@ import { faker } from "@faker-js/faker";
 
 import { Pathway } from "../../../domain/entity/pathway.entity";
 import { PathwayRepository } from "../../../domain/repository/pathway.repository";
+import { IdGeneratorService } from "../../../domain/services/id-generator.service";
 
-import { UuidGeneratorService } from "../../../infrastructure/srevices/uuid-generator.service";
 
 export class CreateMockPathwaysUseCase {
 
     constructor(
         private readonly pathwayRepository: PathwayRepository,
-        private readonly uuidGeneratorService: UuidGeneratorService,
+        private readonly idOrderedGeneratorService: IdGeneratorService,
     ) { }
 
     execute = async (userId: string, numberOfPathways: number): Promise<void> => {
@@ -52,7 +52,7 @@ export class CreateMockPathwaysUseCase {
 
         for (let i = 0; i < numberOfPathways; i++) {
             const pathwayData: Pathway = {
-                _id: this.uuidGeneratorService.generate(),
+                _id: `HGA_PR_${await this.idOrderedGeneratorService.generateNextIdForPathway()}`,
                 userId,
                 title: faker.lorem.words(3),
                 description: faker.lorem.sentences(2),

@@ -8,4 +8,5 @@ export interface UserRepository {
     findByResetPasswordToken(resetPasswordToken: string): Promise<User | null>;
     update(userId: string, userData: Partial<User>): Promise<User | null>;
     delete(id: string): Promise<void>;
+    getAllIds(id: string): Promise<string[]>;
 }

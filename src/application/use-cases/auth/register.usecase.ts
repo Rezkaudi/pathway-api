@@ -7,7 +7,7 @@ import { MailService } from "../../../domain/services/mail.service";
 import { UserRepository } from "../../../domain/repository/user.repository"
 import { EncryptionService } from "../../../domain/services/encryption.service";
 import { RandomStringGenerator } from "../../../domain/services/random-str-generator.service";
-import { UuidGeneratorService } from "../../../infrastructure/srevices/uuid-generator.service";
+import { IdGeneratorService } from "../../../domain/services/id-generator.service";
 
 
 export class RegisterUseCase {
@@ -18,7 +18,7 @@ export class RegisterUseCase {
         private readonly emailService: MailService,
         private readonly userRepository: UserRepository,
         private readonly encryptionService: EncryptionService,
-        private readonly uuidGeneratorService: UuidGeneratorService,
+        private readonly idOrderedGeneratorService: IdGeneratorService,
         private readonly randomStringGenerator: RandomStringGenerator,
 
     ) { }
@@ -40,7 +40,7 @@ export class RegisterUseCase {
         const verificationToken = this.randomStringGenerator.generate(32);
 
         const user = {
-            _id: this.uuidGeneratorService.generate(),
+            _id: `USER_${await this.idOrderedGeneratorService.generateNextIdForUser()}`,
             email: registerData.email,
             password: hashedPassword,
             firstName: registerData.firstName,

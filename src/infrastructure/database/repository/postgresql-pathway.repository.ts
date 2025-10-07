@@ -73,6 +73,7 @@ export class PostgreSQLPathwayRepository implements PathwayRepository {
         const cleanString = (value: any) => typeof value === 'string' ? value.trim().toLowerCase() : value;
 
         const pathwayEntity = this.toEntity(pathway);
+        console.log(pathwayEntity)
 
         // Clean string fields
         if (pathwayEntity.title) pathwayEntity.title = cleanString(pathwayEntity.title);
@@ -164,6 +165,11 @@ export class PostgreSQLPathwayRepository implements PathwayRepository {
         return this.toDomain(updatedEntity);
     };
 
+    async getAllIds(): Promise<string[]> {
+        const entities = await this.repository.find({ select: ['_id'] });
+        return entities.map(e => e._id);
+    }
+
     // Convert Domain Pathway to PathwayEntity
     private toEntity(domain: Pathway): PathwayEntity {
         const entity = new PathwayEntity();
@@ -173,12 +179,25 @@ export class PostgreSQLPathwayRepository implements PathwayRepository {
         entity.description = domain.description;
         entity.species = domain.species;
         entity.category = domain.category;
-        entity.tissue = domain.tissue;
+        entity.tissue = typeof domain.tissue === 'string'
+            ? JSON.parse(domain.tissue)
+            : domain.tissue || {}
+
         entity.relatedDisease = domain.relatedDisease;
-        entity.diseaseInput = domain.diseaseInput;
-        entity.reactions = domain.reactions;
+        entity.diseaseInput = typeof domain.diseaseInput === 'string'
+            ? JSON.parse(domain.diseaseInput)
+            : domain.diseaseInput || {}
+
+        // Parse the string to JSON if it's a string, otherwise keep as is
+        entity.reactions = typeof domain.reactions === 'string'
+            ? JSON.parse(domain.reactions)
+            : domain.reactions || [];
+
         entity.recordDate = domain.recordDate;
-        entity.pubMeds = domain.pubMeds;
+        entity.pubMeds = typeof domain.pubMeds === 'string'
+            ? JSON.parse(domain.pubMeds)
+            : domain.pubMeds || [];
+
         entity.createdAt = domain.createdAt;
         entity.updatedAt = domain.updatedAt;
         return entity;
@@ -193,12 +212,23 @@ export class PostgreSQLPathwayRepository implements PathwayRepository {
             description: entity.description,
             species: entity.species,
             category: entity.category,
-            tissue: entity.tissue,
+            tissue: typeof entity.tissue === 'string'
+                ? JSON.parse(entity.tissue)
+                : entity.tissue || {},
+
             relatedDisease: entity.relatedDisease,
-            diseaseInput: entity.diseaseInput,
-            reactions: entity.reactions,
+            diseaseInput: typeof entity.diseaseInput === 'string'
+                ? JSON.parse(entity.diseaseInput)
+                : entity.diseaseInput || {},
+
+            reactions: typeof entity.reactions === 'string'
+                ? JSON.parse(entity.reactions)
+                : entity.reactions || [],
+
             recordDate: entity.recordDate,
-            pubMeds: entity.pubMeds,
+            pubMeds: typeof entity.pubMeds === 'string'
+                ? JSON.parse(entity.pubMeds)
+                : entity.pubMeds || [],
             createdAt: entity.createdAt,
             updatedAt: entity.updatedAt
         };

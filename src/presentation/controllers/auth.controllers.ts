@@ -11,13 +11,14 @@ import {
     ResendVerificationUseCase
 } from "../../application/use-cases/auth";
 
-import { CONFIG } from "../config/env.config";
 import { Messages, StatusCodes } from "../config/constant.config";
 
 import { LoginDTO, RegisterDTO, ResetPasswordDTO, TokenDTO, UpdatePasswordDTO } from "../../application/dtos/user.dto";
 
 import { ForbiddenError } from "../../application/errors/application-error";
 import { ApplicationResponse } from "../../application/response/application-resposne";
+
+import { clearTokensCookie, setTokensCookie, getRefreshToken } from "../config/cookie.config";
 
 
 export class AuthController {
@@ -30,18 +31,8 @@ export class AuthController {
         private readonly refreshAccessTokenUseCase: RefreshAccessTokenUseCase,
         private readonly updatePasswordUseCase: UpdatePasswordUseCase,
         private readonly resendVerificationUseCase: ResendVerificationUseCase,
-
+        private readonly frontEndUrl: string,
     ) { }
-
-    private setTokenCookie(res: Response, token: TokenDTO, tokenValue: string): void {
-
-        res.cookie(token.name, tokenValue, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "none",
-            maxAge: token.age,
-        });
-    }
 
     register = async (req: Request, res: Response): Promise<void> => {
         try {
@@ -80,8 +71,7 @@ export class AuthController {
 
             const { accessToken, refreshToken } = await this.loginUseCase.execute(loginData);
 
-            this.setTokenCookie(res, CONFIG.ACCESS_TOKEN_COOKIE, accessToken);
-            this.setTokenCookie(res, CONFIG.REFRESH_TOKEN_COOKIE, refreshToken);
+            setTokensCookie(res, accessToken, refreshToken)
 
             return new ApplicationResponse(res, {
                 statusCode: StatusCodes.OK,
@@ -98,14 +88,7 @@ export class AuthController {
     logout = async (req: Request, res: Response): Promise<void> => {
 
         try {
-            const cookieOptions = {
-                httpOnly: true,
-                secure: true,
-                sameSite: "none" as const
-            }
-
-            res.clearCookie(CONFIG.ACCESS_TOKEN_COOKIE.name, cookieOptions);
-            res.clearCookie(CONFIG.REFRESH_TOKEN_COOKIE.name, cookieOptions);
+            clearTokensCookie(res)
 
             return new ApplicationResponse(res, {
                 statusCode: StatusCodes.OK,
@@ -124,10 +107,9 @@ export class AuthController {
             const { verificationToken } = req.query;
             const { accessToken, refreshToken } = await this.verifyEmailUseCase.execute(verificationToken as string);
 
-            this.setTokenCookie(res, CONFIG.ACCESS_TOKEN_COOKIE, accessToken);
-            this.setTokenCookie(res, CONFIG.REFRESH_TOKEN_COOKIE, refreshToken);
+            setTokensCookie(res, accessToken, refreshToken)
 
-            res.status(200).redirect(`${CONFIG.FRONT_URL}/profile`);
+            res.status(200).redirect(`${this.frontEndUrl}/profile`);
 
         } catch (error) {
             throw error
@@ -172,14 +154,14 @@ export class AuthController {
 
     refreshAccessToken = async (req: Request, res: Response): Promise<void> => {
         try {
-            const refreshToken = req.cookies[CONFIG.REFRESH_TOKEN_COOKIE.name];
+            const refreshToken = getRefreshToken(req);
 
             if (!refreshToken) {
                 throw new ForbiddenError()
             }
             const newAccessToken = await this.refreshAccessTokenUseCase.execute(refreshToken);
 
-            this.setTokenCookie(res, CONFIG.ACCESS_TOKEN_COOKIE, newAccessToken);
+            setTokensCookie(res, newAccessToken, refreshToken)
 
             return new ApplicationResponse(res, {
                 statusCode: StatusCodes.OK,

@@ -1,7 +1,6 @@
 
 import { Request, Response } from "express"
 
-import { CONFIG } from "../config/env.config";
 import { Messages, StatusCodes } from "../config/constant.config";
 
 import {
@@ -10,11 +9,11 @@ import {
     DeleteUserAccountUseCase,
 } from "../../application/use-cases/user";
 
-import { UserInfoDTO } from "../../application/dtos/user.dto";
 
 import { ApplicationResponse } from "../../application/response/application-resposne";
 import { User } from "../../domain/entity/user.entity";
 
+import { clearTokensCookie, setTokensCookie, getRefreshToken } from "../config/cookie.config";
 
 export class UserController {
     constructor(
@@ -77,15 +76,7 @@ export class UserController {
             const userId = req.user._id
             await this.deleteUserAccountUseCase.execute(userId)
 
-            const cookieOptions = {
-                httpOnly: true,
-                secure: CONFIG.NODE_ENV === "production",
-                sameSite: "none" as const
-            }
-
-            res.clearCookie(CONFIG.ACCESS_TOKEN_COOKIE.name, cookieOptions);
-            res.clearCookie(CONFIG.REFRESH_TOKEN_COOKIE.name, cookieOptions);
-
+            clearTokensCookie(res)
             req.user = null
 
             return new ApplicationResponse(res, {

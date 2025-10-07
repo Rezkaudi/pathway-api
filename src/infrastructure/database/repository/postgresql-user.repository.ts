@@ -69,6 +69,11 @@ export class PostgreSQLUserRepository implements UserRepository {
         await this.repository.delete(id);
     };
 
+    async getAllIds(): Promise<string[]> {
+        const entities = await this.repository.find({ select: ['_id'] });
+        return entities.map(e => e._id);
+    }
+
     // Convert Domain User to UserEntity
     private toEntity(domain: User): UserEntity {
         const entity = new UserEntity();

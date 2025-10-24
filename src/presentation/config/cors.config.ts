@@ -7,7 +7,8 @@ export const allowedOrigins = [
     'https://clean-architcture-express.vercel.app',
     'https://pathway-repo.alpha.kb-tohsa.org',
     'https://pathway-db.alpha.kb-tohsa.org',
-    'https://pathway-api.alpha.kb-tohsa.org'
+    'https://pathway-api.alpha.kb-tohsa.org',
+    "https://protein-pathway-git-preview-hakam-aldeen-alkhadraas-projects.vercel.app"
 ];
 
 export const corsOptions: CorsOptions = {
